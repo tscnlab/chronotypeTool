@@ -41,3 +41,7 @@
 .calculation-details .insight-card{padding:20px 0 0;border:0}.calculation-details .insight-card>.section-kicker,.calculation-details .insight-card>h2{display:none}.calculation-details .calculation-list{margin:15px 0}.calculation-details .calculation-list>div{padding:14px 0}.calculation-details .calculation-list>.calculation-total{padding:16px 12px;margin:10px -12px}.calculation-details .insight-intro,.calculation-details .insight-note{font-size:14px}.calculation-details .science-link{margin:16px 0}
 @media(max-width:1100px){.reference-card{padding:26px}.reference-card h2{font-size:29px}}
 @media(max-width:760px){.reference-card{padding:23px}.reference-card h2{font-size:27px}.reference-figure{margin:20px -10px 10px}.reference-key{font-size:12px;gap:10px 18px}.reference-intro{font-size:14px}.reference-top .section-kicker{font-size:11px}.reference-count{font-size:12px}.reference-figure svg{min-height:190px}}
+
+/* Unavailable MSFsc: a distinct status colour plus an explicit text label. */
+.score-card.score-card-unavailable{background:#fff1e7;color:#743b0e;border:1px solid #e37222;border-top-width:5px}
+.score-card-unavailable .eyebrow,.score-card-unavailable .score-explainer{color:inherit}

@@ -143,7 +143,7 @@ function renderResult(focus=false){
   $('#result').innerHTML=`
     <div class="result-heading"><div><div class="eyebrow">${t('MCTQ','MCTQ')}</div><h1 tabindex="-1">${t('Your result','Dein Ergebnis')}</h1><p>${t('A summary of your sleep times.','Eine Übersicht deiner Schlafzeiten.')}</p></div><span class="pill">${t('MCTQ · sleep-timing core','MCTQ · Kernfragen zu Schlafzeiten')}</span></div>
     <div class="result-grid">
-      <article class="score-card"><div class="eyebrow">${result.eligible?t('Your MSFsc','Dein MSFsc'):t('No chronotype estimate','Keine Chronotyp-Schätzung')}</div>
+      <article class="score-card${result.eligible?'':' score-card-unavailable'}"><div class="eyebrow">${result.eligible?t('Your MSFsc','Dein MSFsc'):t('MSFsc unavailable','MSFsc nicht verfügbar')}</div>
       ${result.eligible?`<div class="score-value">${formatTime(result.msfsc)}</div><div class="score-unit">${t('Corrected sleep midpoint · MSF','Korrigierte Schlafmitte · MSF')}<sub>sc</sub></div><p class="score-explainer">${t('The midpoint of your sleep on free days, corrected for extra sleep relative to your weekly average.','Die Mitte deines Schlafs an freien Tagen, korrigiert für zusätzlichen Schlaf im Vergleich zu deinem Wochenschnitt.')}</p><figure class="clock-figure"><div class="sleep-clock">${clockSvg(result.free,lang,result.msfsc)}</div><figcaption><strong>A</strong> ${t('Free-day sleep & corrected midpoint','Schlaf an freien Tagen & korrigierte Mitte')}</figcaption></figure>`:`<h2>${reason[0]}</h2><p class="score-explainer" style="max-width:100%">${reason[1]}</p>`}
       </article>
       ${referencePanel()}
