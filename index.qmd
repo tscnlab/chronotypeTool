@@ -1,0 +1,57 @@
+---
+title: "Chronotype lab — Technical University of Munich"
+lang: en
+format:
+  html:
+    theme: none
+    css: assets/style.css
+    page-layout: custom
+    minimal: true
+    title-block-style: none
+    title-block: false
+    html-math-method: plain
+    include-in-header:
+      text: |
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Explore your sleep timing with the MCTQ. No account needed; answers stay on your device.">
+        <meta name="theme-color" content="#003359">
+        <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+        <script type="module" src="assets/app.js"></script>
+---
+
+```{=html}
+<a class="skip-link" href="#questionnaire">Skip to questionnaire</a>
+<div class="app-shell">
+  <header class="site-header">
+    <a class="wordmark" href="./" aria-label="Chronotype lab home"><img id="tum-logo" class="tum-logo" src="assets/tum-en.png" alt="Technical University of Munich"><span class="wordmark-title">Chronotype lab<small>Discover your natural rhythm</small></span></a>
+    <div class="header-meta"><span class="event-name">THE STUDENT CHRONOTYPE LAB</span><span id="mode-badge" class="pill">No sign-in needed</span><div class="language-switch" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="de" aria-pressed="false">DE</button></div></div>
+  </header>
+  <main id="app-main">
+    <section id="questionnaire" class="questionnaire-layout" aria-label="Chronotype questionnaire">
+      <aside class="intro-panel">
+        <div class="eyebrow">SAME PLANET. DIFFERENT BODY CLOCKS.</div>
+        <h1>What’s your<br>natural <em>rhythm?</em></h1>
+        <p class="intro-copy">A few questions about your sleep.<br>A little insight into your inner clock.</p>
+        <figure class="clock-figure">
+          <div id="sleep-clock" class="sleep-clock"></div>
+          <figcaption><strong>A</strong> <span id="clock-caption">Your sleep, around the clock</span></figcaption>
+        </figure>
+        <div class="intro-footer"><span>ABOUT 3 MINUTES</span><span>BASED ON THE MCTQ</span></div>
+      </aside>
+      <div class="form-panel">
+        <nav class="step-nav" aria-label="Questionnaire progress" id="step-nav"></nav>
+        <div id="form-content"></div>
+        <div class="form-footnote">Think of your usual sleep over the past few weeks, rather than an unusually late night or a holiday. Use local clock times.</div>
+      </div>
+    </section>
+    <section id="result" class="result-layout" hidden aria-label="Your chronotype result"></section>
+  </main>
+  <footer class="site-footer"><span>A little science. A lot of different rhythms.</span><div><a href="methods.html">The science &amp; data</a><button class="text-button" id="privacy-button">Privacy</button></div></footer>
+</div>
+<dialog id="privacy-dialog" aria-labelledby="privacy-title">
+  <button class="close-button" id="close-privacy" aria-label="Close privacy information">×</button>
+  <div class="eyebrow">YOUR CHOICE</div><h2 id="privacy-title">Your sleep. Your data.</h2>
+  <p>Your answers and result stay in this tab and are not sent or saved by the app. No account is needed. Read <a href="methods.html#data-and-deployment">the data notes</a> for details.</p>
+</dialog>
+<noscript><p class="noscript">Please enable JavaScript to complete the questionnaire. You can still read <a href="methods.html">the scoring method</a>.</p></noscript>
+```

@@ -1,0 +1,12 @@
+project:
+  type: default
+  output-dir: docs
+  render:
+    - reference.qmd
+    - index.qmd
+    - methods.qmd
+  resources:
+    - assets/
+    - .nojekyll
+execute:
+  freeze: false

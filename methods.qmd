@@ -1,0 +1,162 @@
+---
+title: "Chronotype lab: science and reproducibility"
+subtitle: "MCTQ sleep-timing core · English / Deutsch"
+author: "Student event implementation"
+date: "2026-10-08"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-summary: "Show reproducible code"
+    embed-resources: true
+    html-math-method: mathml
+    css: assets/methods.css
+execute:
+  warning: false
+  message: false
+---
+
+[Open the questionnaire / Zum Fragebogen](index.html)
+
+## What this tool measures
+
+The result is **MSF~sc~**, the sleep-debt-corrected midpoint of sleep on free days, expressed as a local clock time. This is a continuous proxy for chronotype, not a diagnostic score. The tool does not invent universal cutoffs for “owls” and “larks”, or compare students against a fabricated population distribution.
+
+This student-event interface is an **adaptation of the MCTQ sleep-timing core**, not a reproduction of the full validated MCTQ or a separately validated English/German questionnaire. It asks for the variables needed for this calculation: scheduled days per week, time of preparing to sleep, sleep latency, sleep end on scheduled/free days, free-day waking conditions, and shift-work eligibility. It omits full-questionnaire items such as outdoor light exposure and time spent in bed after waking. The German interface is an event translation, not a claim of a newly validated translation.
+
+**Deutsch.** Das Ergebnis ist die korrigierte Schlafmitte an freien Tagen (MSF~sc~), angegeben als lokale Uhrzeit. Diese Veranstaltungsversion verwendet die für die Berechnung nötigen MCTQ-Kernfragen. Sie ersetzt weder den vollständigen validierten Fragebogen noch eine medizinische Untersuchung. Es werden keine festen Grenzen zwischen „Eulen“ und „Lerchen“ erfunden.
+
+## Scoring
+
+Let $W$ be the number of scheduled days, $P$ the clock time when a person tries to sleep, $L$ the latency in minutes, and $E$ the waking time. All internal arithmetic uses minutes, preserving fractions until display.
+
+$$SO = (P + L) \bmod 1440$$
+
+$$SD = ((E-P) \bmod 1440) - L$$
+
+$$MS = (SO + SD/2) \bmod 1440$$
+
+$$SD_{week} = \frac{W\,SD_W + (7-W)\,SD_F}{7}$$
+
+$$MSF_{sc} = \begin{cases}
+MSF & SD_F \le SD_W \\
+\left(MSF - \frac{SD_F-SD_{week}}{2}\right) \bmod 1440 & SD_F > SD_W
+\end{cases}$$
+
+The free-day alarm restriction and correction follow the [rOpenSci `mctq` specification](https://docs.ropensci.org/mctq/reference/msf_sc.html). The browser and background worker share one JavaScript scoring module. The independent R comparison below uses the published **`mctq` 0.3.2** implementation, rather than duplicating the JavaScript formula as the only check.
+
+### Eligibility and input checks
+
+- A free-day alarm makes MSF~sc~ unavailable. Other involuntary waking is conservatively excluded too. Sleep-duration summaries can still be shown.
+- Shift/night work needs MCTQ Shift and is outside this event version.
+- This implementation requires 1–6 scheduled days and both observed day types. It excludes zero/seven-day schedules instead of filling in hypothetical sleep. The package discusses [possible missing-section workarounds](https://docs.ropensci.org/mctq/articles/missing-sections.html), which are not applied here.
+- Form checks reject missing or malformed times, latencies outside 0–240 integer minutes, and computed sleep durations outside (0, 960] minutes. These are transparent **application plausibility limits**, not published MCTQ diagnostic thresholds. Unusual but valid schedules may require an organiser to use the full questionnaire.
+- Sleep is a single main interval, possibly crossing midnight. Clock arithmetic does not apply date, daylight-saving, or time-zone conversions. Students should report usual local times.
+- The score is not normalised for age or sex. The fixed reference sample is descriptive; it is not a population norm.
+
+## Independent calculation check
+
+The following chunk regenerates **512 deterministic synthetic cases** from the production JavaScript module. It covers sleep around the full 24-hour clock, 1–6 scheduled days, different sleep latencies, longer/shorter free-day sleep, and alarm exclusions. It compares each intermediate quantity against the R package and stops the render if the results disagree.
+
+```{r}
+#| label: validation
+stopifnot(requireNamespace("mctq", quietly = TRUE))
+stopifnot(as.character(packageVersion("mctq")) == "0.3.2")
+status <- system2("node", "scripts/fixtures.mjs", stdout = TRUE, stderr = TRUE)
+if (!is.null(attr(status, "status"))) stop(paste(status, collapse = "\n"))
+d <- jsonlite::fromJSON(paste(status, collapse="\n"))
+so_w <- mctq::so(hms::parse_hm(d$prep_w), lubridate::dminutes(d$latency_w))
+so_f <- mctq::so(hms::parse_hm(d$prep_f), lubridate::dminutes(d$latency_f))
+sd_w <- mctq::sdu(so_w, hms::parse_hm(d$wake_w))
+sd_f <- mctq::sdu(so_f, hms::parse_hm(d$wake_f))
+msf <- mctq::msl(so_f, sd_f)
+weekly <- mctq::sd_week(sd_w, sd_f, d$work_days)
+r_msfsc <- mctq::msf_sc(msf, sd_w, sd_f, weekly, as.logical(d$alarm_f))
+checks <- list(
+  onset_work = as.numeric(so_w)/60 - d$js_onset_w,
+  duration_work = as.numeric(sd_w)/60 - d$js_duration_w,
+  onset_free = as.numeric(so_f)/60 - d$js_onset_f,
+  duration_free = as.numeric(sd_f)/60 - d$js_duration_f,
+  midpoint_free = as.numeric(msf)/60 - d$js_midpoint_f,
+  weekly_duration = as.numeric(weekly)/60 - d$js_weekly,
+  corrected_midpoint = as.numeric(r_msfsc)/60 - d$js_msfsc
+)
+stopifnot(identical(is.na(r_msfsc), is.na(d$js_msfsc)))
+stopifnot(max(abs(unlist(checks)), na.rm = TRUE) < 1e-7)
+verification <- data.frame(
+  Quantity = names(checks),
+  `Max absolute difference (minutes)` = vapply(checks, function(x) max(abs(x), na.rm=TRUE), numeric(1)),
+  check.names = FALSE
+)
+knitr::kable(verification, digits=10, row.names=FALSE)
+```
+
+All cases above are artificial test inputs, not event participants. The figure uses an additional worked example with five scheduled days: sleep from 23:30–07:00 on scheduled days and 01:00–10:00 on free days. It gives a free-day midpoint of 05:30 and corrected midpoint of **04:58** after final display rounding.
+
+```{r}
+#| label: validation-figure
+#| fig-width: 10
+#| fig-height: 4
+#| fig-cap: "Synthetic validation only. A: a worked example of the sleep-debt correction. B: JavaScript and the independent R implementation agree across all eligible synthetic cases."
+draw_validation <- function() {
+  par(mfrow=c(1,2), mar=c(4.5,6.2,3.2,1.3), family="sans", col.axis="#45627b", col.lab="#003359", fg="#003359")
+  plot(NA, xlim=c(21,35), ylim=c(0.5,2.5), yaxt="n", xaxt="n", xlab="Local clock time", ylab="", bty="n")
+  axis(1, at=c(22,24,26,28,30,32,34), labels=c("22:00","00:00","02:00","04:00","06:00","08:00","10:00"), cex.axis=.8)
+  axis(2, at=c(1,2), labels=c("Free","Scheduled"), las=1, cex.axis=.8)
+  segments(c(25,23.5), c(1,2), c(34,31), c(1,2), lwd=14, col=c("#98c6ea","#0065bd"), lend=1)
+  points(29.5,1,pch=21,bg="white",col="#003359",cex=1.4)
+  corrected <- 29.5 - (9-(5*7.5+2*9)/7)/2
+  segments(corrected,.65,corrected,1.35,col="#e37222",lwd=2)
+  text(corrected,.54,"04:58",col="#003359",cex=.85)
+  legend("topleft",legend=c("Uncorrected midpoint","Corrected midpoint"),pch=c(21,NA),lty=c(NA,1),col=c("#003359","#e37222"),pt.bg="white",bty="n",cex=.8)
+  title(main=expression(bold(A)~plain("Sleep timing and correction")),adj=0,cex.main=1)
+  ok <- !is.na(d$js_msfsc)
+  plot(d$js_msfsc[ok]/60,as.numeric(r_msfsc)[ok]/3600,pch=16,cex=.5,col=grDevices::adjustcolor("#0065bd",.45),xlim=c(0,24),ylim=c(0,24),xlab="JavaScript midpoint (hours)",ylab="R mctq midpoint (hours)",bty="l")
+  abline(0,1,col="#e37222",lty=2)
+  title(main=expression(bold(B)~plain("Independent scoring agreement")),adj=0,cex.main=1)
+}
+draw_validation()
+png("assets/scoring-validation.png", width=2000,height=800,res=200)
+draw_validation()
+invisible(dev.off())
+```
+
+## Data and deployment {#data-and-deployment}
+
+Personal results are computed in the browser, using a module Web Worker where supported and a same-module fallback otherwise. The questionnaire loads no third-party fonts, analytics, or trackers. Supplied TUM logo images are served with the site. Answers are kept in the current tab only; the app does not use cookies or browser storage.
+
+The app is a **personal calculator with no score collection**. It requires no account and sends no questionnaire answers or results to GitHub or any other server. The result page reports the person's MSFsc and explains the free-day midpoint and correction. A fixed, aggregated historical reference sample provides context; new participants are never added to it and no population percentile is reported. See [reference distribution](reference.html).
+
+Answers and results exist only in the current tab's memory. Reloading the page clears them. The app does not write to local storage, session storage, IndexedDB, or cookies, and has no submission endpoint or background data polling. The website host still receives normal connection information such as an IP address when serving the page; questionnaire answers and results are not included.
+
+GitHub Pages serves the static HTML and assets. GitHub Actions only runs tests, renders these Quarto notebooks, verifies the calculations against R, and deploys the site. It does not receive participant data. The synthetic validation data and plots in this report are development checks. The reference chart reads the fixed aggregate counts in `assets/reference-data.js`. No participant records or source attachments are included in the project.
+
+**Deutsch.** Diese App berechnet nur dein persönliches Ergebnis. Du brauchst kein Konto. Antworten und Ergebnisse bleiben im Arbeitsspeicher des aktuellen Tabs und werden weder übertragen noch gespeichert. Wenn du die Seite neu lädst, werden sie gelöscht. Eine feste historische Referenzstichprobe wird als zusammengefasste Verteilung angezeigt. Neue Antworten werden nicht hinzugefügt. GitHub Actions prüft und veröffentlicht ausschließlich die Website; es erhält keine Teilnehmendendaten.
+
+The interface is inspired by the supplied TUM Corporate Design Manual (2016), especially the blue/white palette and Arial for screen use. The logo files are the supplied original English and German images. This is a style-guided event application, not a claim of official certification.
+
+## Reproduce
+
+Use Quarto 1.6.43, Node.js 22 or later, and R 4.5.0. The setup script installs the rendering dependencies and pins `mctq` to 0.3.2.
+
+```bash
+npm run setup
+npm test
+npm run build
+npm run dev
+```
+
+`reference.qmd` validates and plots the aggregate distribution in code. `index.qmd` produces the interactive tool. `methods.qmd` regenerates 512 synthetic test cases in memory and executes the independent R comparison. The build runs in a fresh temporary directory and produces only the audited static site in `docs/`. All local links work beneath a GitHub project path.
+
+```{r}
+#| label: session
+sessionInfo()
+```
+
+## References
+
+- Roenneberg, T., Wirz-Justice, A., & Merrow, M. (2003). *Life between clocks: daily temporal patterns of human chronotypes*. [doi:10.1177/0748730402239679](https://doi.org/10.1177/0748730402239679).
+- Roenneberg, T., Allebrandt, K. V., Merrow, M., & Vetter, C. (2012). *Social jetlag and obesity*. [doi:10.1016/j.cub.2012.03.038](https://doi.org/10.1016/j.cub.2012.03.038).
+- Vartanian, D., et al. [`mctq`: Munich ChronoType Questionnaire Tools](https://docs.ropensci.org/mctq/). Pinned comparison version: 0.3.2.
+- [The Worldwide Experimental Platform: MCTQ](https://www.thewep.org/documentations/mctq).

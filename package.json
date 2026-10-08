@@ -1,0 +1,15 @@
+{
+  "name": "circadian-chronotype-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node server/dev.mjs",
+    "setup": "Rscript --vanilla scripts/setup-r.R",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "fixtures": "node scripts/fixtures.mjs"
+  },
+  "engines": { "node": ">=22.13" }
+}

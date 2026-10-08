@@ -1,0 +1,82 @@
+---
+title: "The chronotype reference distribution"
+subtitle: "A fixed µMCTQ reference sample"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+    code-summary: "Show reproducible code"
+    embed-resources: true
+    css: assets/methods.css
+execute:
+  warning: false
+  message: false
+---
+
+[Open the questionnaire / Zum Fragebogen](index.html) · [Scoring method](methods.html)
+
+## What this comparison means
+
+The questionnaire reports **MSF~sc~**, the sleep-debt-corrected midpoint of sleep on free days. The reference panel compares that clock time with a **fixed aggregate distribution of 679 records**. New visitors are never added to it. The sample is descriptive, not a representative population norm or an age- and sex-adjusted comparison. No population percentile or diagnostic category is inferred.
+
+The reference was derived using the µMCTQ definitions: actual sleep onset and waking on free days without an alarm, with usual sleep reported over six weeks. It includes non-shift schedules with 1–6 scheduled days and complete, plausible main sleep intervals of more than zero and at most 16 hours. Calculation details are in the [scoring notes](methods.html) and the [rOpenSci specification](https://docs.ropensci.org/mctq/reference/msf_sc.html).
+
+## Aggregate data
+
+The only retained reference data are the **48 bin counts** in `assets/reference-data.js`, together with their units and sample size. There are no participant records or source attachments in this project. The browser and this notebook read the same distribution.
+
+Bins are half-open, [start, end), with 30-minute intervals covering noon to the next noon. This keeps 23:59 and 00:01 adjacent. The personal marker may extend the chart's displayed range, but never changes any bar height or the sample size. Earlier/lark and later/owl indicate direction along a continuous scale.
+
+```{r}
+#| label: reference-data
+for (candidate_locale in c("C.UTF-8", "en_US.UTF-8", "UTF-8")) {
+  if (nzchar(suppressWarnings(Sys.setlocale("LC_CTYPE", candidate_locale)))) break
+}
+reference_json <- system2("node", "scripts/reference.mjs", stdout=TRUE)
+if (!is.null(attr(reference_json, "status"))) stop("Could not read the aggregate reference.")
+reference <- jsonlite::fromJSON(paste(reference_json, collapse="\n"))
+stopifnot(reference$n == sum(reference$counts), length(reference$counts) == 48,
+          reference$binMinutes == 30, reference$startMinute == 720,
+          all(reference$counts >= 0), all(reference$counts == floor(reference$counts)))
+knitr::kable(data.frame(Quantity=c("Records", "Bin width (minutes)", "Number of bins"),
+                        Value=c(reference$n, reference$binMinutes, length(reference$counts))))
+```
+
+## Reference distribution
+
+```{r}
+#| label: reference-figure
+#| fig-width: 9
+#| fig-height: 4.9
+#| fig-cap: "Fixed reference sample. Counts per 30-minute interval; no new questionnaire responses are collected. Arrows indicate earlier (lark) and later (owl) timing along a continuous scale."
+draw_reference <- function(r) {
+  populated <- which(r$counts > 0)
+  first <- max(1,min(populated)-2); last <- min(48,max(populated)+2)
+  edges <- seq(12,36,by=.5)
+  par(mar=c(6.2,4.9,3.3,1.2),las=1,family="sans",col.axis="#45627b",col.lab="#003359",fg="#003359")
+  plot(NA,xlim=edges[c(first,last+1)],ylim=c(0,max(r$counts)*1.16),
+       xaxt="n",xlab="MSFsc (local clock time)",ylab="Records per 30 minutes",bty="l",xaxs="i",yaxs="i")
+  abline(h=axTicks(2),col="#e4edf4",lwd=.8)
+  rect(edges[1:48]+.025,0,edges[2:49]-.025,r$counts,col="#0065bd",border=NA)
+  tick <- seq(12,36,by=2); tick <- tick[tick >= edges[first] & tick <= edges[last+1]]
+  axis(1,at=tick,labels=sprintf("%02d:00",as.integer(tick)%%24),cex.axis=.9)
+  bounds <- par("usr")[1:2]; span <- diff(bounds)
+  annotation_y <- grconvertY(grconvertY(0,"npc","inches")-4.7*par("csi"),"inches","user")
+  text(bounds[1]+.025*span,annotation_y,"Earlier / lark",adj=c(0,.5),cex=.85,col="#003359",xpd=NA)
+  text(bounds[2]-.025*span,annotation_y,"Later / owl",adj=c(1,.5),cex=.85,col="#003359",xpd=NA)
+  arrows(bounds[1]+.017*span,annotation_y,bounds[1],annotation_y,length=.05,angle=25,col="#003359",xpd=NA)
+  arrows(bounds[2]-.017*span,annotation_y,bounds[2],annotation_y,length=.05,angle=25,col="#003359",xpd=NA)
+  title(main=bquote(bold(A)~plain("MSFsc in the reference sample")~plain(.(paste0("(n = ",r$n,")")))),adj=0,cex.main=1)
+}
+draw_reference(reference)
+png("assets/reference-distribution.png",width=1800,height=980,res=200)
+draw_reference(reference)
+invisible(dev.off())
+```
+
+## Reproduce
+
+Run `npm run setup` once to install the R dependencies, then `npm run build`. The build renders this notebook and regenerates the reference figure from the distribution in code. It does not need any source survey files, credentials, or data service.
+
+**Deutsch.** Die Referenz ist eine feste, zusammengefasste µMCTQ-Verteilung mit 679 Datensätzen. Neue Antworten werden weder gespeichert noch hinzugefügt. Im Projekt bleiben ausschließlich die Häufigkeiten der 30-Minuten-Intervalle. Die Stichprobe ist keine repräsentative Bevölkerungsnorm.
