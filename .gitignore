@@ -1,0 +1,21 @@
+# Local toolchain and caches
+.R-library/
+.quarto/
+.Rhistory
+.RData
+node_modules/
+.DS_Store
+
+# Generated website; GitHub Actions builds it from source.
+docs/
+
+# Keep attachments, raw tables and credentials out of version control.
+*.pdf
+*.csv
+*.tsv
+*.xlsx
+*.rds
+*.RData
+*.zip
+.env
+.env.*
