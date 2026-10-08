@@ -1,5 +1,5 @@
 import { scoreMctq, sleepPeriod, formatTime } from './scoring.js';
-import { clockSvg, referenceSvg } from './charts.js';
+import { clockSvg, referenceSvg, referencePosition } from './charts.js';
 import reference from './reference-data.js';
 
 let lang = 'en', step = 0, result = null, busy = false, requestId = 0;
@@ -123,6 +123,25 @@ function resultExplanation() {
   }
   return `<article class="insight-card"><div class="section-kicker">${t('MSFsc','MSFsc')}</div><h2>${t('Calculation','Berechnung')}</h2>${details}<a class="science-link" href="methods.html">${t('Scoring method','Berechnung und Hintergrund')}</a><p class="private-note">${t('Your answers and result are not saved.','Deine Angaben und dein Ergebnis werden nicht gespeichert.')}</p></article>`;
 }
+function referenceInterpretation() {
+  if (!result.eligible || !reference) return '';
+  const position = referencePosition(reference, result.msfsc);
+  const copy = {
+    earlier: [
+      t('Earlier side · lark-like', 'Eher früh · Lerche'),
+      t('Your sleep timing is earlier than most in this sample. “Lark-like” means a tendency towards earlier sleep times.', 'Deine Schlafzeiten liegen früher als bei den meisten in dieser Stichprobe. „Lerche“ beschreibt eine Tendenz zu früheren Schlafzeiten.')
+    ],
+    middle: [
+      t('Near the middle', 'Nahe der Mitte'),
+      t('Your sleep timing is close to the middle of this sample, between the earlier “larks” and later “owls”.', 'Deine Schlafzeiten liegen nahe der Mitte dieser Stichprobe, zwischen den früheren „Lerchen“ und den späteren „Eulen“.')
+    ],
+    later: [
+      t('Later side · owl-like', 'Eher spät · Eule'),
+      t('Your sleep timing is later than most in this sample. “Owl-like” means a tendency towards later sleep times.', 'Deine Schlafzeiten liegen später als bei den meisten in dieser Stichprobe. „Eule“ beschreibt eine Tendenz zu späteren Schlafzeiten.')
+    ]
+  }[position];
+  return `<div class="reference-interpretation" aria-labelledby="position-title"><div class="section-kicker">${t('Your position in this sample', 'Deine Position in dieser Stichprobe')}</div><h3 id="position-title">${copy[0]}</h3><p>${copy[1]}</p></div>`;
+}
 function referencePanel() {
   if (!reference) return `<article class="reference-card"><div class="section-kicker">${t('Reference sample','Referenzstichprobe')}</div><h2>${(result.eligible?t('Your MSFsc','Dein MSFsc'):t('About the reference.','Über die Referenz.'))}</h2><p class="reference-note">${t('The reference data are unavailable. Your personal result is calculated independently.','Die Referenzdaten sind nicht verfügbar. Dein persönliches Ergebnis wird unabhängig davon berechnet.')}</p><a class="science-link" href="reference.html">${t('About the reference data','Über die Referenzdaten')}</a><details class="calculation-details"><summary>${t('How your result is calculated','So wird dein Ergebnis berechnet')}</summary>${resultExplanation()}</details></article>`;
   const table=reference.counts.map((count,i)=>`<tr><td>${formatTime(720+i*30)}–${formatTime(750+i*30)}</td><td>${count}</td></tr>`).join('');
@@ -130,6 +149,7 @@ function referencePanel() {
     <div class="reference-top"><div class="section-kicker">${t('Reference sample','Referenzstichprobe')}</div><span class="reference-count">n = ${reference.n}</span></div>
     <h2>${t('Reference distribution','Referenzverteilung')}</h2>
     <p class="reference-intro">${result.eligible?t('The orange line shows your result.','Die orange Linie zeigt deinen Wert.'):t('No personal marker is shown because your MSFsc could not be calculated.','Da dein MSFsc nicht berechnet werden konnte, wird keine persönliche Markierung angezeigt.')}</p>
+    ${referenceInterpretation()}
     <figure class="reference-figure">${referenceSvg(reference,result.eligible?result.msfsc:null,lang,window.matchMedia('(max-width:760px)').matches)}<figcaption><strong>B</strong> ${t('MSF','MSF')}<sub>sc</sub> ${t('in the reference sample','in der Referenzstichprobe')}</figcaption></figure>
     <div class="reference-key"><span><i class="key-bar"></i>${t('Reference records','Referenzdaten')}</span>${result.eligible?`<span><i class="key-marker"></i>${t('Your MSF','Dein MSF')}<sub>sc</sub> ${formatTime(result.msfsc)}</span>`:''}</div>
     <p class="reference-note">${t('Each bar shows the number of µMCTQ records in a 30-minute interval. This sample is not a population norm. Your result is not added to it.','Jeder Balken zeigt die Anzahl der µMCTQ-Werte in einem 30-Minuten-Intervall. Die Stichprobe ist keine Bevölkerungsnorm. Dein Wert wird nicht hinzugefügt.')}</p>

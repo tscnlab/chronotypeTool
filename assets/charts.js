@@ -27,6 +27,7 @@ export function referenceGeometry(reference, midpoint = null) {
       reference.counts.reduce((a,b) => a+b,0) !== reference.n || reference.n < 1) {
     throw new Error('Invalid reference distribution');
   }
+  if (midpoint !== null && !Number.isFinite(midpoint)) throw new Error('Invalid midpoint');
   const marker = midpoint === null ? null : 720 + wrap(midpoint - 720);
   const occupied = reference.counts.flatMap((n,i) => n ? [i] : []);
   let first = Math.max(0, Math.min(...occupied) - 2);
@@ -37,6 +38,19 @@ export function referenceGeometry(reference, midpoint = null) {
   }
   const min = 720 + first * 30, max = 720 + last * 30;
   return { min, max, marker, bins: reference.counts.map((count,i) => ({start:720+i*30,count})).slice(first,last) };
+}
+
+// Describe position relative to this sample only. The individual values within
+// each bin are unknown, so the bin containing the median remains "middle".
+export function referencePosition(reference, midpoint = null) {
+  const { marker } = referenceGeometry(reference, midpoint);
+  if (marker === null) return null;
+  const index = Math.floor((marker - reference.startMinute) / reference.binMinutes);
+  const before = reference.counts.slice(0, index).reduce((sum, count) => sum + count, 0);
+  const through = before + reference.counts[index];
+  if (through < reference.n / 2) return 'earlier';
+  if (before > reference.n / 2) return 'later';
+  return 'middle';
 }
 
 export function referenceSvg(reference, midpoint = null, lang = 'en', compact = false) {

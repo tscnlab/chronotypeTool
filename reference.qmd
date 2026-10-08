@@ -28,6 +28,20 @@ The only retained reference data are the **48 bin counts** in `assets/reference-
 
 Bins are half-open, [start, end), with 30-minute intervals covering noon to the next noon. This keeps 23:59 and 00:01 adjacent. The personal marker may extend the chart's displayed range, but never changes any bar height or the sample size. Earlier/lark and later/owl indicate direction along a continuous scale.
 
+### How the position label is chosen
+
+The result includes a short description of its position **within this sample**:
+
+- **Earlier side · lark-like:** more than half of the reference records are in later half-hour bins.
+- **Later side · owl-like:** more than half are in earlier half-hour bins.
+- **Near the middle:** neither condition holds. This includes the bin containing the sample median.
+
+The comparison uses the unrounded MSF~sc~ and the same noon-to-noon ordering as the chart. It uses only the saved bin counts, with no assumptions about where individual values fall within a bin. An exact half-sample boundary is kept in the middle group. No label is shown when MSF~sc~ is unavailable.
+
+These are descriptions for reading this chart, not validated chronotype categories or universal cutoffs. The labels describe sleep timing: “lark-like” towards earlier times and “owl-like” towards later times. They do not rate sleep quality or prescribe a sleep schedule. The background is described in the [MCTQ documentation](https://www.thewep.org/documentations/mctq).
+
+**Deutsch.** Die Einordnung gilt nur innerhalb dieser Stichprobe. Liegen mehr als die Hälfte der Referenzwerte in späteren Intervallen, erscheint „Eher früh · Lerche“; liegen sie in früheren Intervallen, „Eher spät · Eule“. Sonst erscheint „Nahe der Mitte“. Die Einordnung beschreibt die Lage im Diagramm, keine festen Chronotyp-Grenzen. Ohne MSF~sc~ wird keine Einordnung angezeigt.
+
 ```{r}
 #| label: reference-data
 for (candidate_locale in c("C.UTF-8", "en_US.UTF-8", "UTF-8")) {

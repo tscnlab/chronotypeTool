@@ -2,6 +2,8 @@
 
 A bilingual English/German, mobile-friendly MCTQ sleep-timing calculator for a student event. It reports **MSFsc** and shows the result against a fixed **µMCTQ reference distribution of 679 records**, with earlier/lark and later/owl annotations. The TUM logos are served locally.
 
+Eligible results also describe their position in this sample as earlier/lark-like, near the middle, or later/owl-like. The comparison uses the aggregate median band, with no exact percentiles or universal chronotype cutoffs. The rule is documented in `reference.qmd` and checked in the chart tests.
+
 Participants need no account. Calculations run in the browser; answers and results stay in the current tab's memory and disappear on reload. There is no database, submission endpoint, analytics or score collection. The website host receives ordinary connection information, but no questionnaire answers or scores.
 
 ## Build and preview
