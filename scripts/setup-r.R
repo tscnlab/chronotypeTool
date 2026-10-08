@@ -10,11 +10,16 @@ if (is.null(repositories) || !length(repositories) || any(repositories == "@CRAN
 required <- c("knitr", "rmarkdown", "jsonlite", "remotes")
 missing <- required[!vapply(required, requireNamespace, logical(1), quietly=TRUE)]
 if (length(missing)) install.packages(missing, lib=library_path, repos=repositories)
+unavailable <- required[!vapply(required, requireNamespace, logical(1), quietly=TRUE)]
+if (length(unavailable)) {
+  stop("Could not load rendering dependencies: ", paste(unavailable, collapse=", "),
+       ". Check the package installation errors above.")
+}
 installed_version <- tryCatch(as.character(packageVersion("mctq")), error=function(e) "")
 if (installed_version != "0.3.2") {
   remotes::install_version("mctq", version="0.3.2", lib=library_path,
                            repos=repositories, upgrade="never", dependencies=NA)
 }
-stopifnot(all(vapply(c(required, "mctq"), requireNamespace, logical(1), quietly=TRUE)),
+stopifnot(requireNamespace("mctq", quietly=TRUE),
           as.character(packageVersion("mctq")) == "0.3.2")
 cat("Rendering dependencies ready; mctq pinned to 0.3.2.\n")

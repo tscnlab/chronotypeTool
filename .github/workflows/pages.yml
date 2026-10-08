@@ -28,6 +28,10 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: '1.6.43'
+      - name: Install system dependency for R rendering packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libuv1-dev
       - name: Install rendering dependencies
         run: npm run setup
       - name: Render and independently verify the Quarto notebooks
