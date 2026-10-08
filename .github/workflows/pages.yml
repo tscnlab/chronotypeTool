@@ -9,9 +9,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    env:
-      R_LIBS_USER: ${{ github.workspace }}/.R-library
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -32,6 +30,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends libuv1-dev
+      - name: Cache R rendering packages
+        uses: actions/cache@v5
+        with:
+          path: .R-library
+          key: r-ubuntu24.04-${{ runner.arch }}-4.5.0-${{ hashFiles('scripts/setup-r.R') }}
       - name: Install rendering dependencies
         run: npm run setup
       - name: Render and independently verify the Quarto notebooks
@@ -45,7 +48,7 @@ jobs:
   deploy:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       pages: write
       id-token: write

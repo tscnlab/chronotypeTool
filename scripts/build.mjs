@@ -14,10 +14,12 @@ try {
     await mkdir(path.dirname(path.join(temporary, file)), { recursive: true });
     await cp(path.join(root, file), path.join(temporary, file));
   }
-  const library = process.env.R_LIBS_USER || path.join(root, '.R-library');
+  // setup-r may replace R_LIBS_USER. Always include the library npm run setup uses,
+  // resolving it before Quarto changes into the temporary build directory.
+  const libraries = [path.join(root, '.R-library'), ...(process.env.R_LIBS_USER || '').split(path.delimiter).filter(Boolean)];
   const render = spawnSync('quarto', ['render'], {
     cwd: temporary,
-    env: { ...process.env, R_LIBS_USER: library.split(path.delimiter).map(p => path.resolve(root, p)).join(path.delimiter) },
+    env: { ...process.env, R_LIBS_USER: [...new Set(libraries.map(p => path.resolve(root, p)))].join(path.delimiter) },
     stdio: 'inherit'
   });
   if (render.error) throw render.error;

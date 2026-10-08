@@ -4,7 +4,11 @@ dir.create(library_path, recursive=TRUE, showWarnings=FALSE)
 library_path <- normalizePath(library_path, mustWork=TRUE)
 .libPaths(c(library_path, .libPaths()))
 repositories <- getOption("repos")
-if (is.null(repositories) || !length(repositories) || any(repositories == "@CRAN@")) {
+# --vanilla skips setup-r's R profile, so use its package-manager environment too.
+package_manager <- Sys.getenv("RSPM", unset="")
+if (nzchar(package_manager)) {
+  repositories <- c(CRAN=package_manager)
+} else if (is.null(repositories) || !length(repositories) || any(repositories == "@CRAN@")) {
   repositories <- c(CRAN="https://cloud.r-project.org")
 }
 required <- c("knitr", "rmarkdown", "jsonlite", "remotes")
