@@ -48,3 +48,15 @@
 /* Unavailable MSFsc: a distinct status colour plus an explicit text label. */
 .score-card.score-card-unavailable{background:#fff1e7;color:#743b0e;border:1px solid #e37222;border-top-width:5px}
 .score-card-unavailable .eyebrow,.score-card-unavailable .score-explainer{color:inherit}
+
+/* The difference between the two observed sleep midpoints. */
+.social-jetlag-card{display:grid;grid-template-columns:1fr 2fr;gap:32px;margin-top:24px;padding:28px 32px;border:1px solid var(--line);border-radius:var(--radius);background:#edf4fa}
+.social-jetlag-card h2{font-size:20px;font-weight:400;line-height:1.3}
+.social-jetlag-value{font-size:40px;line-height:1.2;letter-spacing:-1px;margin-top:12px;font-variant-numeric:tabular-nums}
+.social-jetlag-copy>p{font-size:16px;line-height:1.6}
+.social-jetlag-copy .social-jetlag-definition,.social-jetlag-copy .social-jetlag-note{font-size:14px;color:var(--muted);margin-top:8px}
+.social-jetlag-midpoints{display:flex;flex-wrap:wrap;gap:16px 28px;margin:18px 0 12px}
+.social-jetlag-midpoints dt{font-size:12px;color:var(--muted)}
+.social-jetlag-midpoints dd{font-size:22px;font-variant-numeric:tabular-nums;margin:2px 0 0}
+.social-jetlag-method{font-size:13px}
+@media(max-width:760px){.social-jetlag-card{grid-template-columns:1fr;gap:18px;padding:23px;margin-top:18px}.social-jetlag-value{font-size:36px}.social-jetlag-copy>p{font-size:15px}}

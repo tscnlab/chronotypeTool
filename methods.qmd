@@ -48,12 +48,30 @@ The free-day alarm restriction and correction follow the [rOpenSci `mctq` specif
 
 ### Eligibility and input checks
 
-- A free-day alarm makes MSF~sc~ unavailable. Other involuntary waking is conservatively excluded too. Sleep-duration summaries can still be shown.
+- A free-day alarm makes MSF~sc~ unavailable. Other involuntary waking is conservatively excluded too. Sleep-duration summaries and social jetlag from the reported sleep times can still be shown.
 - Shift/night work needs MCTQ Shift and is outside this event version.
 - This implementation requires 1–6 scheduled days and both observed day types. It excludes zero/seven-day schedules instead of filling in hypothetical sleep. The package discusses [possible missing-section workarounds](https://docs.ropensci.org/mctq/articles/missing-sections.html), which are not applied here.
 - Form checks reject missing or malformed times, latencies outside 0–240 integer minutes, and computed sleep durations outside (0, 960] minutes. These are transparent **application plausibility limits**, not published MCTQ diagnostic thresholds. Unusual but valid schedules may require an organiser to use the full questionnaire.
 - Sleep is a single main interval, possibly crossing midnight. Clock arithmetic does not apply date, daylight-saving, or time-zone conversions. Students should report usual local times.
 - The score is not normalised for age or sex. The fixed reference sample is descriptive; it is not a population norm.
+
+### Social jetlag {#social-jetlag}
+
+Social jetlag compares the **uncorrected** sleep midpoints on scheduled days (MSW) and free days (MSF). The result shows the absolute difference as a duration, plus whether the free-day midpoint is earlier or later. It does not use MSF~sc~.
+
+For clock minutes $D = MSF - MSW$:
+
+$$SJL_{rel} = \begin{cases}
+D - 1440 & D > 720 \\
+D + 1440 & D < -720 \\
+D & \text{otherwise}
+\end{cases} \qquad SJL = |SJL_{rel}|$$
+
+This follows [`mctq::sjl(method = "shorter")`](https://docs.ropensci.org/mctq/reference/sjl.html). It uses the shorter interval around midnight: 23:30 to 00:30 is one hour later. The package explains the [clock-arithmetic choices](https://docs.ropensci.org/mctq/articles/sjl-computation.html). At exactly 12 hours, the calculation retains the raw sign but the interface reports only the distance, because both directions are equally short.
+
+Social jetlag is calculated whenever both day types have valid reported sleep times, including free-day alarms or external waking. This describes the reported schedule; the separate MSF~sc~ exclusion still applies. Shift work and schedules without both day types remain unsupported. No health thresholds are assigned.
+
+**Deutsch.** Sozialer Jetlag ist der Abstand zwischen den unkorrigierten Schlafmitten vor Pflicht- und freien Tagen. Angezeigt werden der kürzere Abstand auf der Uhr und die Richtung. Er lässt sich auch berechnen, wenn ein Wecker oder anderes Wecken die MSF~sc~-Schätzung ausschließt.
 
 ## Independent calculation check
 
@@ -71,18 +89,25 @@ so_f <- mctq::so(hms::parse_hm(d$prep_f), lubridate::dminutes(d$latency_f))
 sd_w <- mctq::sdu(so_w, hms::parse_hm(d$wake_w))
 sd_f <- mctq::sdu(so_f, hms::parse_hm(d$wake_f))
 msf <- mctq::msl(so_f, sd_f)
+msw <- mctq::msl(so_w, sd_w)
 weekly <- mctq::sd_week(sd_w, sd_f, d$work_days)
 r_msfsc <- mctq::msf_sc(msf, sd_w, sd_f, weekly, as.logical(d$alarm_f))
+r_sjl <- mctq::sjl(msw, msf, abs = TRUE, method = "shorter")
+r_sjl_relative <- mctq::sjl(msw, msf, abs = FALSE, method = "shorter")
 checks <- list(
   onset_work = as.numeric(so_w)/60 - d$js_onset_w,
   duration_work = as.numeric(sd_w)/60 - d$js_duration_w,
   onset_free = as.numeric(so_f)/60 - d$js_onset_f,
   duration_free = as.numeric(sd_f)/60 - d$js_duration_f,
+  midpoint_work = as.numeric(msw)/60 - d$js_midpoint_w,
   midpoint_free = as.numeric(msf)/60 - d$js_midpoint_f,
   weekly_duration = as.numeric(weekly)/60 - d$js_weekly,
-  corrected_midpoint = as.numeric(r_msfsc)/60 - d$js_msfsc
+  corrected_midpoint = as.numeric(r_msfsc)/60 - d$js_msfsc,
+  social_jetlag = as.numeric(r_sjl)/60 - d$js_sjl,
+  social_jetlag_relative = as.numeric(r_sjl_relative)/60 - d$js_sjl_relative
 )
 stopifnot(identical(is.na(r_msfsc), is.na(d$js_msfsc)))
+stopifnot(!anyNA(r_sjl), !anyNA(r_sjl_relative), !anyNA(d$js_sjl), !anyNA(d$js_sjl_relative))
 stopifnot(max(abs(unlist(checks)), na.rm = TRUE) < 1e-7)
 verification <- data.frame(
   Quantity = names(checks),
@@ -92,7 +117,7 @@ verification <- data.frame(
 knitr::kable(verification, digits=10, row.names=FALSE)
 ```
 
-All cases above are artificial test inputs, not event participants. The figure uses an additional worked example with five scheduled days: sleep from 23:30–07:00 on scheduled days and 01:00–10:00 on free days. It gives a free-day midpoint of 05:30 and corrected midpoint of **04:58** after final display rounding.
+All cases above are artificial test inputs, not event participants. The figure uses an additional worked example with five scheduled days: sleep from 23:30–07:00 on scheduled days and 01:00–10:00 on free days. It gives a free-day midpoint of 05:30 and corrected midpoint of **04:58** after final display rounding. The scheduled-day midpoint is 03:15, giving **2 hours 15 minutes of social jetlag**, with later sleep on free days.
 
 ```{r}
 #| label: validation-figure
@@ -129,6 +154,8 @@ Personal results are computed in the browser, using a module Web Worker where su
 The app is a **personal calculator with no score collection**. It requires no account and sends no questionnaire answers or results to GitHub or any other server. The result page reports the person's MSFsc and explains the free-day midpoint and correction. A fixed, aggregated historical reference sample provides context; new participants are never added to it and no population percentile is reported. See [reference distribution](reference.html).
 
 Answers and results exist only in the current tab's memory. Reloading the page clears them. The app does not write to local storage, session storage, IndexedDB, or cookies, and has no submission endpoint or background data polling. The website host still receives normal connection information such as an IP address when serving the page; questionnaire answers and results are not included.
+
+The language can be bookmarked or shared using `?lang=en` or `?lang=de`. Switching languages updates the address while keeping the current answers in memory. The URL contains the language choice, never questionnaire answers or results. Missing or unsupported language values open English.
 
 GitHub Pages serves the static HTML and assets. GitHub Actions only runs tests, renders these Quarto notebooks, verifies the calculations against R, and deploys the site. It does not receive participant data. The synthetic validation data and plots in this report are development checks. The reference chart reads the fixed aggregate counts in `assets/reference-data.js`. No participant records or source attachments are included in the project.
 

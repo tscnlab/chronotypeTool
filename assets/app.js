@@ -1,8 +1,9 @@
 import { scoreMctq, sleepPeriod, formatTime } from './scoring.js';
 import { clockSvg, referenceSvg, referencePosition } from './charts.js';
 import reference from './reference-data.js';
+import { languageFromSearch, languageUrl } from './language.js';
 
-let lang = 'en', step = 0, result = null, busy = false, requestId = 0;
+let lang = languageFromSearch(window.location.search), step = 0, result = null, busy = false, requestId = 0;
 const answers = { workDays: null, shiftWork: null, work: { prep: '', latency: '', wake: '' }, free: { prep: '', latency: '', wake: '' }, freeWake: '' };
 const t = (en,de) => lang === 'de' ? de : en;
 const $ = sel => document.querySelector(sel);
@@ -39,6 +40,7 @@ function translateStatic() {
   $('#tum-logo').src=`assets/tum-${lang}.png`;$('#tum-logo').alt=t('Technical University of Munich','Technische Universität München');
   $('.wordmark-title').innerHTML=`${t('Chronotype lab','Chronotyp-Labor')}<small>${t('Sleep questionnaire','Fragebogen zu Schlafzeiten')}</small>`;
   $('.wordmark').setAttribute('aria-label',t('Chronotype lab home','Chronotyp-Labor Startseite'));
+  $('.wordmark').href=languageUrl(new URL('./',window.location.href).href,lang);
   $('.skip-link').textContent=t('Skip to questionnaire','Zum Fragebogen');
   $('.language-switch').setAttribute('aria-label',t('Language','Sprache'));
   document.querySelectorAll('[data-language]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.language===lang));
@@ -157,6 +159,23 @@ function referencePanel() {
     <details class="calculation-details"><summary>${result.eligible?t('How your MSFsc is calculated','So wird dein MSFsc berechnet'):t('About your result','Über dein Ergebnis')}</summary>${resultExplanation()}</details>
   </article>`;
 }
+function socialJetlagPanel() {
+  if (!Number.isFinite(result.socialJetlag)) return '';
+  const amount=duration(result.socialJetlag);
+  let explanation;
+  if (result.socialJetlag===0) explanation=t('Your sleep midpoint is the same on scheduled and free days.','Deine Schlafmitte ist an Pflicht- und freien Tagen gleich.');
+  else if (result.socialJetlag===720) explanation=t('Your sleep midpoints are 12 hours apart. At this distance, earlier and later are equally far around the clock.','Deine Schlafmitten liegen 12 Stunden auseinander. Bei diesem Abstand sind beide Richtungen auf der Uhr gleich weit.');
+  else explanation=result.socialJetlagSigned>0
+    ? t(`Your sleep midpoint is ${amount} later on free days.`,`Deine Schlafmitte liegt an freien Tagen ${amount} später.`)
+    : t(`Your sleep midpoint is ${amount} earlier on free days.`,`Deine Schlafmitte liegt an freien Tagen ${amount} früher.`);
+  return `<article class="social-jetlag-card" aria-labelledby="social-jetlag-title">
+    <div><h2 id="social-jetlag-title">${t('Social jetlag','Sozialer Jetlag')}</h2><div class="social-jetlag-value">${amount}</div></div>
+    <div class="social-jetlag-copy"><p>${explanation}</p><p class="social-jetlag-definition">${t('Social jetlag is the difference between the middle of your sleep on scheduled and free days.','Sozialer Jetlag ist der Unterschied zwischen der Mitte deines Schlafs an Pflicht- und freien Tagen.')}</p>
+    <dl class="social-jetlag-midpoints"><div><dt>${t('Scheduled-day midpoint','Schlafmitte vor Pflichttagen')}</dt><dd>${formatTime(result.work.midpoint)}</dd></div><div><dt>${t('Free-day midpoint','Schlafmitte vor freien Tagen')}</dt><dd>${formatTime(result.free.midpoint)}</dd></div></dl>
+    ${!result.eligible?`<p class="social-jetlag-note">${t('This compares your reported sleep times, including any alarm or other waking. It can be calculated even when MSFsc is unavailable.','Verglichen werden deine angegebenen Schlafzeiten, auch wenn du geweckt wirst. Dieser Wert lässt sich auch ohne MSFsc berechnen.')}</p>`:''}
+    <a class="social-jetlag-method" href="methods.html#social-jetlag">${t('How social jetlag is calculated','So wird sozialer Jetlag berechnet')}</a></div>
+  </article>`;
+}
 function renderResult(focus=false){
   $('#questionnaire').hidden=true;$('#result').hidden=false;
   const reason=result.eligible?null:reasonCopy(result.reason);
@@ -168,12 +187,19 @@ function renderResult(focus=false){
       </article>
       ${referencePanel()}
     </div>
+    ${socialJetlagPanel()}
     ${result.work?`<div class="metrics-row"><div class="metric"><div class="metric-label">${t('Scheduled-day sleep','Schlaf vor Pflichttagen')}</div><div class="metric-value">${duration(result.work.duration)}</div><div class="metric-note">${formatTime(result.work.onset)}–${formatTime(result.work.wake)}</div></div><div class="metric"><div class="metric-label">${t('Free-day sleep','Schlaf vor freien Tagen')}</div><div class="metric-value">${duration(result.free.duration)}</div><div class="metric-note">${formatTime(result.free.onset)}–${formatTime(result.free.wake)}</div></div><div class="metric"><div class="metric-label">${t('Weekly average sleep','Schlaf im Wochenschnitt')}</div><div class="metric-value">${duration(result.weekly)}</div><div class="metric-note">${t('Weighted by your scheduled days','Gewichtet nach deinen Pflichttagen')}</div></div></div>`:''}
     <div class="result-bottom" style="margin-top:24px"><p>${t('There is no fixed cutoff between larks and owls. This result is not a diagnosis.','Es gibt keine feste Grenze zwischen Lerchen und Eulen. Das Ergebnis ist keine Diagnose.')} <a href="methods.html">${t('How it works','So funktioniert es')}</a></p><button class="secondary-button" id="edit-answers">${t('Review my answers','Meine Antworten prüfen')}</button></div>`;
   $('#edit-answers').onclick=()=>{step=0;renderForm(true);};
   if(focus){$('#result h1').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 }
-document.querySelectorAll('[data-language]').forEach(b=>b.onclick=()=>{lang=b.dataset.language;translateStatic();if($('#result').hidden)renderForm();else renderResult();});
+function setLanguage(language, updateUrl=false) {
+  lang=language;
+  if(updateUrl) window.history.replaceState(window.history.state,'',languageUrl(window.location.href,lang));
+  translateStatic();if($('#result').hidden)renderForm();else renderResult();
+}
+document.querySelectorAll('[data-language]').forEach(b=>b.onclick=()=>setLanguage(b.dataset.language,true));
+window.addEventListener('popstate',()=>setLanguage(languageFromSearch(window.location.search)));
 window.matchMedia('(max-width:760px)').addEventListener('change',()=>{if(!$('#result').hidden)renderResult();});
 $('#privacy-button').onclick=()=>$('#privacy-dialog').showModal();
 $('#privacy-dialog').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close();});

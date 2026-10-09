@@ -5,13 +5,13 @@ import path from 'node:path';
 export const sourceFiles = [
   '.github/workflows/pages.yml', '.gitignore', '.nojekyll', '_quarto.yml',
   'README.md', 'package.json', 'index.qmd', 'methods.qmd', 'reference.qmd',
-  'assets/app.js', 'assets/charts.js', 'assets/favicon.svg', 'assets/methods.css',
+  'assets/app.js', 'assets/charts.js', 'assets/favicon.svg', 'assets/language.js', 'assets/methods.css',
   'assets/reference-data.js', 'assets/scoring-worker.js', 'assets/scoring.js',
   'assets/style.css', 'assets/tum-de.png', 'assets/tum-en.png',
   'scripts/build.mjs', 'scripts/check.mjs', 'scripts/fixtures.mjs',
   'scripts/project.mjs', 'scripts/reference.mjs', 'scripts/setup-r.R',
   'server/dev.mjs', 'tests/charts.test.mjs', 'tests/deployment.test.mjs',
-  'tests/scoring.test.mjs'
+  'tests/scoring.test.mjs', 'tests/language.test.mjs'
 ];
 export const generatedFigures = ['assets/reference-distribution.png', 'assets/scoring-validation.png'];
 export const publicFiles = [

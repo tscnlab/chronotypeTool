@@ -1,6 +1,6 @@
 // MCTQ sleep-timing core. Times and durations are in minutes; no intermediate rounding.
 // Specification: https://docs.ropensci.org/mctq/reference/msf_sc.html
-export const ALGORITHM = 'mctq-core-1.0.0';
+export const ALGORITHM = 'mctq-core-1.1.0';
 export class InputError extends Error {
   constructor(code) { super(code); this.name = 'InputError'; this.code = code; }
 }
@@ -25,10 +25,17 @@ export function correctedMidpoint(msf, sdW, sdF, weekly, alarmF = false) {
   if (alarmF) return null;
   return wrap(msf - (sdF > sdW ? (sdF - weekly) / 2 : 0));
 }
+// Signed shorter interval, matching mctq::sjl(abs=FALSE, method="shorter").
+// Preserve the raw sign for the exactly 12-hour tie.
+export function socialJetlagDifference(msw, msf) {
+  if (![msw, msf].every(n => Number.isFinite(n) && n >= 0 && n < 1440)) throw new InputError('time');
+  const difference = msf - msw;
+  return difference > 720 ? difference - 1440 : difference < -720 ? difference + 1440 : difference;
+}
 export function scoreMctq(input) {
   if (!input || !Number.isInteger(input.workDays) || input.workDays < 0 || input.workDays > 7) throw new InputError('days');
   if (typeof input.shiftWork !== 'boolean') throw new InputError('shift');
-  const base = { algorithm: ALGORITHM, eligible: false, msfsc: null };
+  const base = { algorithm: ALGORITHM, eligible: false, msfsc: null, socialJetlag: null, socialJetlagSigned: null };
   if (input.shiftWork) return { ...base, reason: 'shift' };
   // Conservative event eligibility: observed work AND free days are required.
   // No extrapolated/hypothetical schedules or missing-section substitutions.
@@ -37,7 +44,8 @@ export function scoreMctq(input) {
   if (!['natural', 'alarm', 'other'].includes(input.freeWake)) throw new InputError('freeWake');
   const weekly = (work.duration * input.workDays + free.duration * (7 - input.workDays)) / 7;
   const correction = free.duration > work.duration ? (free.duration - weekly) / 2 : 0;
-  const common = { ...base, work, free, weekly, correction };
+  const socialJetlagSigned = socialJetlagDifference(work.midpoint, free.midpoint);
+  const common = { ...base, work, free, weekly, correction, socialJetlag: Math.abs(socialJetlagSigned), socialJetlagSigned };
   if (input.freeWake !== 'natural') return { ...common, reason: input.freeWake };
   return { ...common, eligible: true, reason: null, msfsc: correctedMidpoint(free.midpoint, work.duration, free.duration, weekly) };
 }

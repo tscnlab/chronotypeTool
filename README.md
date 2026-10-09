@@ -4,6 +4,10 @@ A bilingual English/German, mobile-friendly MCTQ sleep-timing calculator for a s
 
 Eligible results also describe their position in this sample as earlier/lark-like, near the middle, or later/owl-like. The comparison uses the aggregate median band, with no exact percentiles or universal chronotype cutoffs. The rule is documented in `reference.qmd` and checked in the chart tests.
 
+Results also show **social jetlag**: the shorter interval between the uncorrected scheduled-day and free-day sleep midpoints, with its direction. This follows `mctq::sjl(method = "shorter")` and is independently checked against R for all 512 synthetic cases. It remains available with free-day alarms or other waking; unsupported schedules have no estimate.
+
+Share or bookmark [English](https://tscnlab.github.io/chronotypeTool/?lang=en) or [German](https://tscnlab.github.io/chronotypeTool/?lang=de). Switching languages updates `?lang=` in the address without clearing the current answers. The home link keeps the chosen language. No answers or results are included in the URL.
+
 Participants need no account. Calculations run in the browser; answers and results stay in the current tab's memory and disappear on reload. There is no database, submission endpoint, analytics or score collection. The website host receives ordinary connection information, but no questionnaire answers or scores.
 
 ## Build and preview
