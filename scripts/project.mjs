@@ -4,18 +4,21 @@ import path from 'node:path';
 // Explicit manifests keep local attachments out of both the build and deployment.
 export const sourceFiles = [
   '.github/workflows/pages.yml', '.gitignore', '.nojekyll', '_quarto.yml',
-  'README.md', 'package.json', 'index.qmd', 'methods.qmd', 'reference.qmd',
-  'assets/app.js', 'assets/charts.js', 'assets/favicon.svg', 'assets/language.js', 'assets/methods.css',
+  'README.md', 'package.json', 'index.qmd', 'methods.qmd', 'reference.qmd', 'event-slide.qmd',
+  'assets/advice.js', 'assets/app.js', 'assets/charts.js', 'assets/favicon.svg', 'assets/language.js', 'assets/methods.css',
   'assets/reference-data.js', 'assets/scoring-worker.js', 'assets/scoring.js',
   'assets/style.css', 'assets/tum-de.png', 'assets/tum-en.png',
+  'assets/chronotype-invitation.pdf', 'assets/chronotype-invitation.png',
+  'assets/lark-and-owl.png',
   'scripts/build.mjs', 'scripts/check.mjs', 'scripts/fixtures.mjs',
   'scripts/project.mjs', 'scripts/reference.mjs', 'scripts/setup-r.R',
+  'scripts/slide.mjs', 'scripts/qr.py',
   'server/dev.mjs', 'tests/charts.test.mjs', 'tests/deployment.test.mjs',
   'tests/scoring.test.mjs', 'tests/language.test.mjs'
 ];
 export const generatedFigures = ['assets/reference-distribution.png', 'assets/scoring-validation.png'];
 export const publicFiles = [
-  '.nojekyll', 'index.html', 'methods.html', 'reference.html',
+  '.nojekyll', 'index.html', 'methods.html', 'reference.html', 'event-slide.html',
   ...sourceFiles.filter(file => file.startsWith('assets/')),
   ...generatedFigures
 ];

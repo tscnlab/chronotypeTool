@@ -147,11 +147,29 @@ draw_validation()
 invisible(dev.off())
 ```
 
+## Advice after the result {#sleep-advice}
+
+The English and German advice is general guidance for adults, not a treatment plan inferred from MSFsc, the reference-sample label, or social jetlag. No target bedtime, individual light dose, supplement, or diagnostic threshold is calculated.
+
+| Advice in the tool | Evidence and limits |
+| --- | --- |
+| Daylight during the day; dimmer room lighting and screens in the three hours before bed; a dark sleeping environment | [Brown et al. (2022)](https://doi.org/10.1371/journal.pbio.3001571), an expert consensus based on circadian and sleep research. The underlying recommendations concern healthy adults aged 18–55 with regular daytime schedules. The app translates these into everyday habits without claiming to measure light exposure. Safe vision takes precedence over darkness. |
+| At least seven hours of sleep regularly, with individual needs often higher | [Watson et al. (2015)](https://doi.org/10.5664/jcsm.4758), the American Academy of Sleep Medicine / Sleep Research Society consensus for adults aged 18–60. Seven hours is a lower recommendation, not an optimum for everyone or a maximum. The tool does not assess sleep quality or individual sleep need. |
+| Fairly regular bedtimes and wake times, while allowing recovery after insufficient sleep | [Sletten et al. (2023)](https://doi.org/10.1016/j.sleh.2023.07.016), a consensus informed by a systematic literature review. The panel supports regular sleep timing and the value of catch-up sleep after insufficient weekday sleep. The app therefore does not advise reducing sleep to reduce social jetlag. |
+| Avoid large meals shortly before bed; a light snack is fine; consider caffeine timing | [NHLBI / NIH healthy sleep guidance](https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits). Caffeine can affect sleep for up to eight hours, with individual variation. This is sleep-related nutrition guidance, not a diet prescription. |
+| Weekly aerobic activity and strength exercises | [WHO (2020) guidelines](https://www.who.int/publications/i/item/9789240015128): adults should aim for 150–300 minutes of moderate activity or 75–150 minutes of vigorous activity, plus strengthening major muscle groups on at least two days. Starting gradually is appropriate. These are general health recommendations, not a chronotype-specific exercise schedule. |
+
+These are consensus recommendations, not evidence that this questionnaire or its advice improves health. Sleep timing and duration are only part of sleep health. Persistent sleep problems or frequent marked daytime sleepiness warrant clinical advice.
+
+The shift-work pathway displays the adult sleep-duration, meals/caffeine and activity guidance and a suggestion to seek advice suited to the shift schedule. It omits the daytime-light and regular-schedule tips. Alarm and other external-waking exclusions affect the MSFsc calculation; they do not prevent the general adult advice from being shown.
+
+**Deutsch.** Die Hinweise sind allgemeine Empfehlungen für Erwachsene. Aus MSFsc oder sozialem Jetlag wird weder eine passende Schlafenszeit noch ein Behandlungsplan abgeleitet. Bei Schichtarbeit entfallen die Hinweise zu Tageslicht und regelmäßigen Schlafzeiten zugunsten einer auf den Schichtplan abgestimmten Beratung. Die Quellen sind auch direkt im Ergebnis zugänglich.
+
 ## Data and deployment {#data-and-deployment}
 
 Personal results are computed in the browser, using a module Web Worker where supported and a same-module fallback otherwise. The questionnaire loads no third-party fonts, analytics, or trackers. Supplied TUM logo images are served with the site. Answers are kept in the current tab only; the app does not use cookies or browser storage.
 
-The app is a **personal calculator with no score collection**. It requires no account and sends no questionnaire answers or results to GitHub or any other server. The result page reports the person's MSFsc and explains the free-day midpoint and correction. A fixed, aggregated historical reference sample provides context; new participants are never added to it and no population percentile is reported. See [reference distribution](reference.html).
+The app is a **personal calculator with no score collection**. It sends no questionnaire answers or results to GitHub or any other server. The result page reports the person's MSFsc and explains the free-day midpoint and correction. A fixed, aggregated historical reference sample provides context; new participants are never added to it and no population percentile is reported. See [reference distribution](reference.html).
 
 Answers and results exist only in the current tab's memory. Reloading the page clears them. The app does not write to local storage, session storage, IndexedDB, or cookies, and has no submission endpoint or background data polling. The website host still receives normal connection information such as an IP address when serving the page; questionnaire answers and results are not included.
 
@@ -159,7 +177,7 @@ The language can be bookmarked or shared using `?lang=en` or `?lang=de`. Switchi
 
 GitHub Pages serves the static HTML and assets. GitHub Actions only runs tests, renders these Quarto notebooks, verifies the calculations against R, and deploys the site. It does not receive participant data. The synthetic validation data and plots in this report are development checks. The reference chart reads the fixed aggregate counts in `assets/reference-data.js`. No participant records or source attachments are included in the project.
 
-**Deutsch.** Diese App berechnet nur dein persönliches Ergebnis. Du brauchst kein Konto. Antworten und Ergebnisse bleiben im Arbeitsspeicher des aktuellen Tabs und werden weder übertragen noch gespeichert. Wenn du die Seite neu lädst, werden sie gelöscht. Eine feste historische Referenzstichprobe wird als zusammengefasste Verteilung angezeigt. Neue Antworten werden nicht hinzugefügt. GitHub Actions prüft und veröffentlicht ausschließlich die Website; es erhält keine Teilnehmendendaten.
+**Deutsch.** Diese App berechnet nur dein persönliches Ergebnis. Antworten und Ergebnisse bleiben im Arbeitsspeicher des aktuellen Tabs und werden weder übertragen noch gespeichert. Wenn du die Seite neu lädst, werden sie gelöscht. Eine feste historische Referenzstichprobe wird als zusammengefasste Verteilung angezeigt. Neue Antworten werden nicht hinzugefügt. GitHub Actions prüft und veröffentlicht ausschließlich die Website; es erhält keine Teilnehmendendaten.
 
 The interface is inspired by the supplied TUM Corporate Design Manual (2016), especially the blue/white palette and Arial for screen use. The logo files are the supplied original English and German images. This is a style-guided event application, not a claim of official certification.
 

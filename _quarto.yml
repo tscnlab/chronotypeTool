@@ -5,6 +5,7 @@ project:
     - reference.qmd
     - index.qmd
     - methods.qmd
+    - event-slide.qmd
   resources:
     - assets/
     - .nojekyll

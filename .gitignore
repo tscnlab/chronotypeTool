@@ -11,6 +11,7 @@ docs/
 
 # Keep attachments, raw tables and credentials out of version control.
 *.pdf
+!assets/chronotype-invitation.pdf
 *.csv
 *.tsv
 *.xlsx

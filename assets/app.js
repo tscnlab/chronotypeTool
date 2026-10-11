@@ -2,6 +2,7 @@ import { scoreMctq, sleepPeriod, formatTime } from './scoring.js';
 import { clockSvg, referenceSvg, referencePosition } from './charts.js';
 import reference from './reference-data.js';
 import { languageFromSearch, languageUrl } from './language.js';
+import { sleepAdviceHtml } from './advice.js';
 
 let lang = languageFromSearch(window.location.search), step = 0, result = null, busy = false, requestId = 0;
 const answers = { workDays: null, shiftWork: null, work: { prep: '', latency: '', wake: '' }, free: { prep: '', latency: '', wake: '' }, freeWake: '' };
@@ -44,7 +45,6 @@ function translateStatic() {
   $('.skip-link').textContent=t('Skip to questionnaire','Zum Fragebogen');
   $('.language-switch').setAttribute('aria-label',t('Language','Sprache'));
   document.querySelectorAll('[data-language]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.language===lang));
-  $('#mode-badge').textContent=t('No sign-in needed','Ohne Anmeldung');
   $('.intro-panel .eyebrow').textContent=t('Munich Chronotype Questionnaire','Munich Chronotype Questionnaire');
   $('.intro-panel h1').innerHTML=t('What’s your<br><em>chronotype?</em>','Welcher<br><em>Chronotyp</em><br>bist du?');
   $('.intro-copy').innerHTML=t('Answer a few questions about when you sleep on scheduled days and free days.','Beantworte ein paar Fragen zu deinen Schlafzeiten vor Pflicht- und freien Tagen.');
@@ -53,7 +53,7 @@ function translateStatic() {
   $('.site-footer>span').textContent=t('Munich Chronotype Questionnaire (MCTQ)','Munich Chronotype Questionnaire (MCTQ)');
   $('.site-footer a').textContent=t('Method & reference data','Methode & Referenzdaten');
   $('#privacy-button').textContent=t('Privacy','Datenschutz');
-  $('#privacy-dialog').innerHTML=`<button class="close-button" id="close-privacy" aria-label="${t('Close privacy information','Datenschutzhinweise schließen')}">×</button><div class="eyebrow">${t('Questionnaire data','Fragebogendaten')}</div><h2 id="privacy-title">${t('Privacy','Datenschutz')}</h2><p>${t('Your answers and result stay in this tab. The app does not send or save them. Reloading the page clears them.','Deine Angaben und dein Ergebnis bleiben in diesem Tab. Die App überträgt oder speichert sie nicht. Wenn du die Seite neu lädst, werden sie gelöscht.')}</p><p>${t('No account is needed. This app does not use cookies or tracking. Results are not added to the reference sample.','Du brauchst kein Konto. Die App verwendet keine Cookies und kein Tracking. Ergebnisse werden nicht zur Referenzstichprobe hinzugefügt.')}</p><p>${t('The website host receives normal connection information, such as your IP address, when serving the page. It does not receive your questionnaire answers or result.','Beim Laden der Seite erhält der Hosting-Anbieter übliche Verbindungsinformationen wie deine IP-Adresse. Er erhält weder deine Antworten noch dein Ergebnis.')}</p><p><a href="methods.html#data-and-deployment">${t('How the app handles your data','So geht die App mit deinen Daten um')}</a></p>`;
+  $('#privacy-dialog').innerHTML=`<button class="close-button" id="close-privacy" aria-label="${t('Close privacy information','Datenschutzhinweise schließen')}">×</button><div class="eyebrow">${t('Questionnaire data','Fragebogendaten')}</div><h2 id="privacy-title">${t('Privacy','Datenschutz')}</h2><p>${t('Your answers and result stay in this tab. The app does not send or save them. Reloading the page clears them.','Deine Angaben und dein Ergebnis bleiben in diesem Tab. Die App überträgt oder speichert sie nicht. Wenn du die Seite neu lädst, werden sie gelöscht.')}</p><p>${t('This app does not use cookies or tracking. Results are not added to the reference sample.','Die App verwendet keine Cookies und kein Tracking. Ergebnisse werden nicht zur Referenzstichprobe hinzugefügt.')}</p><p>${t('The website host receives normal connection information, such as your IP address, when serving the page. It does not receive your questionnaire answers or result.','Beim Laden der Seite erhält der Hosting-Anbieter übliche Verbindungsinformationen wie deine IP-Adresse. Er erhält weder deine Antworten noch dein Ergebnis.')}</p><p><a href="methods.html#data-and-deployment">${t('How the app handles your data','So geht die App mit deinen Daten um')}</a></p>`;
   $('#close-privacy').onclick=()=>$('#privacy-dialog').close();
   $('#questionnaire').setAttribute('aria-label',t('Chronotype questionnaire','Chronotyp-Fragebogen'));
   $('#result').setAttribute('aria-label',t('Your chronotype result','Dein Chronotyp-Ergebnis'));
@@ -189,8 +189,12 @@ function renderResult(focus=false){
     </div>
     ${socialJetlagPanel()}
     ${result.work?`<div class="metrics-row"><div class="metric"><div class="metric-label">${t('Scheduled-day sleep','Schlaf vor Pflichttagen')}</div><div class="metric-value">${duration(result.work.duration)}</div><div class="metric-note">${formatTime(result.work.onset)}–${formatTime(result.work.wake)}</div></div><div class="metric"><div class="metric-label">${t('Free-day sleep','Schlaf vor freien Tagen')}</div><div class="metric-value">${duration(result.free.duration)}</div><div class="metric-note">${formatTime(result.free.onset)}–${formatTime(result.free.wake)}</div></div><div class="metric"><div class="metric-label">${t('Weekly average sleep','Schlaf im Wochenschnitt')}</div><div class="metric-value">${duration(result.weekly)}</div><div class="metric-note">${t('Weighted by your scheduled days','Gewichtet nach deinen Pflichttagen')}</div></div></div>`:''}
+    ${sleepAdviceHtml(lang, result.reason === 'shift')}
     <div class="result-bottom" style="margin-top:24px"><p>${t('There is no fixed cutoff between larks and owls. This result is not a diagnosis.','Es gibt keine feste Grenze zwischen Lerchen und Eulen. Das Ergebnis ist keine Diagnose.')} <a href="methods.html">${t('How it works','So funktioniert es')}</a></p><button class="secondary-button" id="edit-answers">${t('Review my answers','Meine Antworten prüfen')}</button></div>`;
   $('#edit-answers').onclick=()=>{step=0;renderForm(true);};
+  document.querySelectorAll('.advice-source-link').forEach(link => link.addEventListener('click', () => {
+    $('.advice-sources').open = true;
+  }));
   if(focus){$('#result h1').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 }
 function setLanguage(language, updateUrl=false) {

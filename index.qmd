@@ -13,7 +13,7 @@ format:
     include-in-header:
       text: |
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="A short sleep questionnaire to calculate your corrected sleep midpoint (MSFsc) and social jetlag. Available in English and German. No account needed.">
+        <meta name="description" content="A short sleep questionnaire to calculate your corrected sleep midpoint (MSFsc) and social jetlag. Available in English and German.">
         <meta name="theme-color" content="#003359">
         <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
         <script type="module" src="assets/app.js"></script>
@@ -24,7 +24,7 @@ format:
 <div class="app-shell">
   <header class="site-header">
     <a class="wordmark" href="./" aria-label="Chronotype lab home"><img id="tum-logo" class="tum-logo" src="assets/tum-en.png" alt="Technical University of Munich"><span class="wordmark-title">Chronotype lab<small>Sleep questionnaire</small></span></a>
-    <div class="header-meta"><span class="event-name">THE STUDENT CHRONOTYPE LAB</span><span id="mode-badge" class="pill">No sign-in needed</span><div class="language-switch" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="de" aria-pressed="false">DE</button></div></div>
+    <div class="header-meta"><span class="event-name">THE STUDENT CHRONOTYPE LAB</span><div class="language-switch" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="de" aria-pressed="false">DE</button></div></div>
   </header>
   <main id="app-main">
     <section id="questionnaire" class="questionnaire-layout" aria-label="Chronotype questionnaire">
