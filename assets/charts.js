@@ -8,14 +8,14 @@ export function clockSvg(period, lang = 'en', midpoint = null) {
   const de = lang === 'de';
   const ticks = Array.from({length:48}, (_,i) => {
     const p=point(i*30,i%2===0?140:145),q=point(i*30,150);
-    return `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${i%6===0?'#d8ecfa':'#78b4e3'}" stroke-width="${i%6===0?2:1}"/>`;
+    return `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${i%6===0?'#98c6ea':'#366487'}" stroke-width="${i%6===0?2:1}"/>`;
   }).join('');
-  const labels = [0,6,12,18].map(h=>{const p=point(h*60,166);return `<text x="${p[0]}" y="${p[1]+4}" text-anchor="middle" fill="#ffffff" font-size="12">${String(h).padStart(2,'0')}</text>`;}).join('');
-  let highlight = `<circle cx="180" cy="180" r="121" fill="none" stroke="#93c4e8" stroke-width="14" stroke-dasharray="2 8"/>`;
-  if(period){const p=point(period.onset+period.duration,121);highlight=`<path d="${arc(period.onset,period.duration,121)}" fill="none" stroke="#d8ecfa" stroke-width="16" stroke-linecap="round"/><circle cx="${p[0]}" cy="${p[1]}" r="6" fill="white"/>`;}
-  if(midpoint!==null){const p=point(midpoint,121);highlight+=`<line x1="180" y1="180" x2="${p[0]}" y2="${p[1]}" stroke="white" stroke-width="5"/><line x1="180" y1="180" x2="${p[0]}" y2="${p[1]}" stroke="#e37222" stroke-width="2"/><circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#e37222" stroke="white" stroke-width="2"/>`;}
+  const labels = [0,6,12,18].map(h=>{const p=point(h*60,166);return `<text x="${p[0]}" y="${p[1]+4}" text-anchor="middle" fill="#c4d9ec" font-size="12">${String(h).padStart(2,'0')}</text>`;}).join('');
+  let highlight = `<circle cx="180" cy="180" r="121" fill="none" stroke="#396784" stroke-width="14" stroke-dasharray="2 8"/>`;
+  if(period){const p=point(period.onset+period.duration,121);highlight=`<path d="${arc(period.onset,period.duration,121)}" fill="none" stroke="#98c6ea" stroke-width="16" stroke-linecap="round"/><circle cx="${p[0]}" cy="${p[1]}" r="6" fill="white"/>`;}
+  if(midpoint!==null){const p=point(midpoint,121);highlight+=`<line x1="180" y1="180" x2="${p[0]}" y2="${p[1]}" stroke="#e37222" stroke-width="2"/><circle cx="${p[0]}" cy="${p[1]}" r="7" fill="#e37222"/>`;}
   const title=period?`${de?'Schlaf':'Sleep'} ${formatTime(period.onset)}–${formatTime(period.wake)}`:(de?'24-Stunden-Uhr. Noch keine Schlafzeiten eingegeben.':'24-hour clock. No sleep times entered yet.');
-  return `<svg viewBox="0 0 360 360" role="img" aria-label="${title}"><title>${title}</title><circle cx="180" cy="180" r="121" fill="none" stroke="#2e85cd" stroke-width="16"/>${ticks}${labels}${highlight}<g class="clock-center"><text x="180" y="173" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-size="33" letter-spacing="-1">${period?formatTime(period.onset):'24'}<tspan font-size="14" fill="#d8ecfa">${period?'':(de?' Std.':' h')}</tspan></text><text x="180" y="198" text-anchor="middle" fill="#d8ecfa" font-size="11" letter-spacing="1">${period?(de?'EINSCHLAFZEIT':'SLEEP ONSET'):(de?'DEIN TAGESRHYTHMUS':'YOUR DAILY RHYTHM')}</text></g></svg>`;
+  return `<svg viewBox="0 0 360 360" role="img" aria-label="${title}"><title>${title}</title><circle cx="180" cy="180" r="121" fill="none" stroke="#24516f" stroke-width="16"/>${ticks}${labels}${highlight}<g class="clock-center"><text x="180" y="173" text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-size="33" letter-spacing="-1">${period?formatTime(period.onset):'24'}<tspan font-size="14" fill="#a9c7df">${period?'':(de?' Std.':' h')}</tspan></text><text x="180" y="198" text-anchor="middle" fill="#a9c7df" font-size="11" letter-spacing="1">${period?(de?'EINSCHLAFZEIT':'SLEEP ONSET'):(de?'DEIN TAGESRHYTHMUS':'YOUR DAILY RHYTHM')}</text></g></svg>`;
 }
 
 // Keep clock times continuous across midnight. The reference bins cover noon to

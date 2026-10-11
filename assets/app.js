@@ -46,7 +46,7 @@ function translateStatic() {
   $('.language-switch').setAttribute('aria-label',t('Language','Sprache'));
   document.querySelectorAll('[data-language]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.language===lang));
   $('.intro-panel .eyebrow').textContent=t('Munich Chronotype Questionnaire','Munich Chronotype Questionnaire');
-  $('.intro-panel h1').innerHTML=t('Early bird<br>or night owl?','Lerche<br>oder Eule?');
+  $('.intro-panel h1').innerHTML=t('What’s your<br><em>chronotype?</em>','Welcher<br><em>Chronotyp</em><br>bist du?');
   $('.intro-copy').innerHTML=t('Answer a few questions about when you sleep on scheduled days and free days.','Beantworte ein paar Fragen zu deinen Schlafzeiten vor Pflicht- und freien Tagen.');
   $('.intro-footer').innerHTML=`<span>${t('About 3 minutes','Etwa 3 Minuten')}</span><span>${t('Based on the MCTQ','Auf Basis des MCTQ')}</span>`;
   $('.form-footnote').textContent=t('Use your usual sleep times from the past few weeks, in local time.','Gib deine üblichen Schlafzeiten der letzten Wochen in Ortszeit an.');
@@ -76,15 +76,7 @@ function renderForm(focus=false) {
   $('#back-button')?.addEventListener('click',()=>{step--;renderForm(true);});
   $('#sleep-form').addEventListener('input',syncInput);$('#sleep-form').addEventListener('change',syncInput);
   $('#sleep-form').addEventListener('submit',onNext);
-  updateClock();
-  if(focus){
-    const title=$('.form-title');
-    title.focus({preventScroll:true});
-    const bounds=title.getBoundingClientRect();
-    if(window.matchMedia('(max-width:760px)').matches || bounds.top<24 || bounds.bottom>window.innerHeight){
-      $('.form-panel').scrollIntoView({block:'start'});
-    }
-  }
+  updateClock();if(focus)$('.form-title').focus({preventScroll:true});
 }
 function syncInput(e) {
   const {name,value}=e.target;
