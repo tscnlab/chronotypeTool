@@ -9,7 +9,6 @@ export const sourceFiles = [
   'assets/reference-data.js', 'assets/scoring-worker.js', 'assets/scoring.js',
   'assets/style.css', 'assets/tum-de.png', 'assets/tum-en.png',
   'assets/chronotype-invitation.pdf', 'assets/chronotype-invitation.png',
-  'assets/lark-and-owl.png',
   'scripts/build.mjs', 'scripts/check.mjs', 'scripts/fixtures.mjs',
   'scripts/project.mjs', 'scripts/reference.mjs', 'scripts/setup-r.R',
   'scripts/slide.mjs', 'scripts/qr.py',

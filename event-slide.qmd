@@ -30,14 +30,7 @@ The QR codes open the published tool directly in [German](https://tscnlab.github
 
 `scripts/slide.mjs` defines the 1600 × 900 slide, its text and original TUM logo placement. `scripts/qr.py` creates both QR codes locally with error correction level Q and a four-module quiet zone. The exported PDF contains one page in 16:9 format. The PNG is rendered from that PDF at 3840 × 2160 pixels.
 
-The English and German headlines use the same font, size and layout. The abstract modernist artwork is retained in `assets/lark-and-owl.png`. It was created with the built-in image-generation tool using the supplied poster collage as a style reference. The TUM logo is the original supplied artwork.
-
-<details>
-<summary>Illustration prompt</summary>
-
-Use case: stylized-concept. Create an original horizontal modernist print artwork for a university chronotype invitation. The attached collage is a STYLE REFERENCE ONLY: take inspiration from its mid-century cut-paper abstraction, bold imperfect ink shapes, warm paper and expressive poster composition. Do not copy any poster, text, face or layout from it. The output is the artwork alone, with no lettering or typography. Aspect ratio 3:1, a wide edge-to-edge art strip. Two interlocking abstract motifs suggest an early lark and a late owl, without depicting full-bodied animals. Left: a dynamic crested profile suggested by a large curved cream shape, an orange wedge and a rising mustard semicircle. Right: an angular nocturnal face implied by two off-centre almond eyes and intersecting navy, cream and burnt-orange arcs. Crop the motifs boldly into the edges; think gallery poster, not icons or mascots. Sophisticated asymmetrical balance, oversized shapes, a few hand-cut irregular contours and subtle dry screenprint grain on warm ivory paper. Palette: cobalt/TUM blue #0065BD, deep navy almost black #082139, ivory #FFF5DC, burnt orange #E37222, small mustard-yellow and muted sage accents. Flat ink, no 3D, no smooth digital gradients. Dense graphic composition but only a few strong shapes, legible at modest slide size. Absolutely no cute cartoon birds, no circular googly eyes, no beaks with smiles, no feet, no realistic feathers, no isolated clip-art figures. No text, no logos, no border, no drop shadow, no photographic mockup. Solid artwork background, not transparent.
-
-</details>
+The English and German headlines use the same font, size and layout. The TUM logo is the original supplied artwork.
 
 For re-authoring, install `@oai/artifact-tool` 2.8.91 in the authoring environment, Python with `reportlab` and `pypdf`, LibreOffice and Poppler. Make `soffice` and `pdftoppm` available on `PATH`. `ARTIFACT_TOOL_MODULE` can name the absolute module entry point when using a bundled runtime; `SLIDE_PYTHON` can select its Python executable. Arial must be installed; `SLIDE_FONT_DIR` can point to its directory. On macOS, the script uses the system supplemental fonts directory.
 
