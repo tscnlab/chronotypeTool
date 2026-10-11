@@ -33,7 +33,7 @@ async function image(name, filename, x, y, width, height) {
 
 // Original supplied mark, unchanged, with its native 1822:590 proportions.
 await image('Technische Universität München', path.join(root, 'assets/tum-de.png'), 1208, 40, 312, 312 * 590 / 1822);
-await image('A lark and an owl', path.join(root, 'assets/lark-and-owl.png'), 692, 30, 216, 105);
+await image('Bauhaus-style lark and owl', path.join(root, 'assets/lark-and-owl.png'), 692, 30, 216, 105);
 for (const [language, label, x, headline, invitation, caption] of [
   ['en', 'English', 80, 'Early bird\nor night owl?', 'Discover your\nchronotype.', 'About 3 minutes.'],
   ['de', 'Deutsch', 850, 'Lerche\noder Eule?', 'Finde deinen\nChronotyp heraus.', 'Etwa 3 Minuten.']
@@ -46,7 +46,7 @@ for (const [language, label, x, headline, invitation, caption] of [
   text(`Scan instruction ${language}`, language === 'de' ? 'QR-Code scannen' : 'Scan the QR code', x + 350, 740, 322, 38, 24);
 }
 text('Website address', 'tscnlab.github.io/chronotypeTool', 80, 837, 900, 38, 24, '#D8ECFA');
-slide.speakerNotes.text = 'Student-event invitation. QR codes open the published questionnaire directly in German and English. Original supplied TUM logo. The approximate three-minute duration describes the application. The small lark-and-owl illustration was generated with the built-in image-generation tool; its prompt is recorded in event-slide.qmd. No scientific claim or participant data is shown.';
+slide.speakerNotes.text = 'Student-event invitation. QR codes open the published questionnaire directly in German and English. Original supplied TUM logo. The approximate three-minute duration describes the application. The Bauhaus-style lark-and-owl illustration was generated with the built-in image-generation tool; its prompt is recorded in event-slide.qmd. No scientific claim or participant data is shown.';
 
 await (await PresentationFile.exportPptx(presentation)).save(path.join(build, 'candidate.pptx'));
 await fs.writeFile(path.join(build, 'slide.layout.json'), await (await slide.export({ format: 'layout' })).text());
