@@ -1,14 +1,6 @@
 // General adult guidance. No treatment or bedtime is inferred from MSFsc.
 export function sleepAdviceHtml(lang, shiftWork = false) {
   const t = (en, de) => lang === 'de' ? de : en;
-  const icons = {
-    daylight: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
-    evening: '<path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/>',
-    sleep: '<path d="M3 19V7m18 12V9M3 15h18M6 11h4M6 8h4m3 3h8"/>',
-    rhythm: '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',
-    nutrition: '<path d="M4 3v5a3 3 0 0 0 6 0V3M7 3v18M19 21V3c-4 3-4 9 0 9"/>',
-    exercise: '<circle cx="15" cy="4" r="2"/><path d="m6 10 5-3 4 4 5 1M11 7l-2 7 5 2 1 5M9 14l-4 6"/>'
-  };
   const tips = [
     { id: 'daylight', source: 1,
       title: t('Get some daylight', 'Tagsüber ins Tageslicht'),
@@ -34,7 +26,7 @@ export function sleepAdviceHtml(lang, shiftWork = false) {
     <div class="advice-heading"><h2 id="advice-title">${t('Looking after your sleep', 'Was deinem Schlaf helfen kann')}</h2><p>${shiftWork
       ? t('Night and rotating shifts need different advice about light and sleep timing. An occupational health or sleep specialist can help you plan around your shifts.', 'Bei Nacht- und Wechselschichten müssen Licht und Schlafzeiten anders geplant werden. Eine betriebsärztliche oder schlafmedizinische Beratung kann dich dabei unterstützen.')
       : t('General recommendations for adults with daytime schedules. Your MSFsc does not tell you when you should go to bed.', 'Allgemeine Empfehlungen für Erwachsene mit einem Tagesrhythmus ohne Schichtarbeit. Dein MSFsc gibt keine Schlafenszeit vor.')}</p></div>
-    <div class="advice-grid${shiftWork ? ' advice-grid-single' : ''}">${shown.map(tip => `<article class="advice-tip"><span class="advice-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${icons[tip.id]}</svg></span><div><h3>${tip.title}</h3><p>${tip.text}</p><a class="advice-source-link" href="#advice-source-${tip.source}">${t('Evidence', 'Quelle')} [${tip.source}]</a></div></article>`).join('')}</div>
+    <div class="advice-grid${shiftWork ? ' advice-grid-single' : ''}">${shown.map((tip, index) => `<article class="advice-tip"><span class="advice-number" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><div><h3>${tip.title}</h3><p>${tip.text}</p><a class="advice-source-link" href="#advice-source-${tip.source}">${t('Evidence', 'Quelle')} [${tip.source}]</a></div></article>`).join('')}</div>
     <div class="advice-footer"><p>${t('If sleep problems persist or you often feel very sleepy during the day, talk to a healthcare professional.', 'Wenn Schlafprobleme anhalten oder du tagsüber oft sehr schläfrig bist, lass dich ärztlich beraten.')}</p><details class="advice-sources"><summary>${t('Where this advice comes from', 'Worauf diese Empfehlungen beruhen')}</summary><p>${t('Research consensus papers and public health guidance. These are general habits, not a treatment plan based on your score.', 'Die Hinweise beruhen auf wissenschaftlichen Konsenspapieren und Gesundheitsempfehlungen. Es sind allgemeine Hinweise, kein aus deinem Wert abgeleiteter Behandlungsplan.')}</p><ol>
       <li id="advice-source-1">Brown et al. (2022). <a href="https://doi.org/10.1371/journal.pbio.3001571" target="_blank" rel="noopener noreferrer">${t('Daytime, evening and nighttime light', 'Licht am Tag, am Abend und in der Nacht')}</a>. <em>PLOS Biology.</em></li>
       <li id="advice-source-2">Watson et al. (2015). <a href="https://doi.org/10.5664/jcsm.4758" target="_blank" rel="noopener noreferrer">${t('Recommended amount of sleep for adults', 'Empfohlene Schlafdauer für Erwachsene')}</a>. <em>Journal of Clinical Sleep Medicine.</em></li>

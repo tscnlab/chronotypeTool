@@ -14,7 +14,7 @@ format:
       text: |
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="A short sleep questionnaire to calculate your corrected sleep midpoint (MSFsc) and social jetlag. Available in English and German.">
-        <meta name="theme-color" content="#003359">
+        <meta name="theme-color" content="#0065BD">
         <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
         <script type="module" src="assets/app.js"></script>
 ---
@@ -30,7 +30,7 @@ format:
     <section id="questionnaire" class="questionnaire-layout" aria-label="Chronotype questionnaire">
       <aside class="intro-panel">
         <div class="eyebrow">Munich Chronotype Questionnaire</div>
-        <h1>What’s your<br><em>chronotype?</em></h1>
+        <h1>Early bird<br>or night owl?</h1>
         <p class="intro-copy">Answer a few questions about when you sleep on scheduled days and free days.</p>
         <figure class="clock-figure">
           <div id="sleep-clock" class="sleep-clock"></div>
